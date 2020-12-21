@@ -1,10 +1,12 @@
 package com.slalom.example.controller;
 
 import com.slalom.example.controller.model.UserWeb;
+import com.slalom.example.domain.entity.User;
 import com.slalom.example.usecase.CreateUser;
 import com.slalom.example.usecase.FindUser;
 import com.slalom.example.usecase.LoginUser;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class UserController {
@@ -20,16 +22,19 @@ public class UserController {
 	}
 
 	public UserWeb createUser(final UserWeb userWeb) {
-		var user = userWeb.toUser();
-		return UserWeb.toUserWeb(createUser.create(user));
+		var userFromWeb = userWeb.toUser();
+		User user = createUser.create(userFromWeb);
+		return UserWeb.toUserWeb(user);
 	}
 
 	public UserWeb login(final String email, final String password) {
-		return UserWeb.toUserWeb(loginUser.login(email, password));
+		User user = loginUser.login(email, password);
+		return UserWeb.toUserWeb(user);
 	}
 
 	public UserWeb getUser(final String userId) {
-		return UserWeb.toUserWeb(findUser.findById(userId).orElseThrow(() -> new RuntimeException("user not found")));
+		Optional<User> user = findUser.findById(userId);
+		return UserWeb.toUserWeb(user.orElseThrow(() -> new RuntimeException("user not found")));
 	}
 
 	public List<UserWeb> allUsers() {
